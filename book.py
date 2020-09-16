@@ -1,10 +1,18 @@
 import requests
 import time
+import datetime
 from bs4 import BeautifulSoup
-import ast
+import json
 
 phoneNum = '15267688090'
 cnt = 0
+day = int(input("选择日期(1：今天，2：明天):"))
+now = datetime.datetime.now()
+
+if(day == 2):
+    now = now + datetime.timedelta(days = 1)
+dayStr = dayStr = now.strftime('%Y-%m-%d')
+
 while(1):
     libIndex = int(input("输入要预约的图书馆编号:")) + 10
     if(libIndex >= 11 and libIndex <= 22):
@@ -13,7 +21,7 @@ while(1):
 while(1):
     cnt = cnt + 1
     print("第" + str(cnt) + '次尝试:', end = '')
-    url = 'http://10.203.97.155/home/book/more/lib/'+ str(libIndex) +'/type/4'
+    url = 'http://10.203.97.155/home/book/more/lib/'+ str(libIndex) +'/type/4/day/' + dayStr
     response = requests.get(url)
     soup = BeautifulSoup(response.content,'lxml')
     rest = soup.find('div', class_="col-xs-12 col-md-4").find('span',style='color:#000;').text if soup else ""
@@ -40,7 +48,7 @@ while(1):
 
             response =  http_session.post('http://10.203.97.155/api.php/activities/' + actid + '/application2', params=questring, headers=form_header)
             if(response.status_code == 200):
-                r = ast.literal_eval(response.content.decode())
+                r = json.loads(response.content.decode())
                 if r['status'] == 1:
                     print("预约成功")
                 else:
